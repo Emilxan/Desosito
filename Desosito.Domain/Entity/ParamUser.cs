@@ -1,4 +1,4 @@
-﻿namespace Desosito.Models
+﻿/*namespace Desosito.Domain.Entity
 {
     public class ParamUser
     {
@@ -8,3 +8,4 @@
 
     }
 }
+*/

@@ -1,4 +1,4 @@
-﻿namespace Desosito.Models
+﻿namespace Desosito.Domain.Enum
 {
     public enum RoleEnum
     {

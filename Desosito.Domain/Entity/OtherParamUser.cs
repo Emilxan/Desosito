@@ -1,4 +1,6 @@
-﻿namespace Desosito.Models
+﻿/*using Desosito.Domain.Enum;
+
+namespace Desosito.Domain.Entity
 {
     public class OtherParamUser : ParamUser
     {
@@ -9,3 +11,4 @@
         public RoleEnum Role { get; set; }
     }
 }
+*/

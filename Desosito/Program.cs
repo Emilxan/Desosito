@@ -1,6 +1,14 @@
 using Desosito;
+using Desosito.DAL;
+using Desosito.DAL.Interface;
+using Desosito.DAL.Repositories;
+using Desosito.Domain.Entity;
 using Desosito.Models;
+using Desosito.Service.Implementations;
+using Desosito.Service.Interfaces;
+using Desosito.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -11,7 +19,27 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<UserDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MvcMovieContext")));
-builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<UserDbContext>();
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DesositoMainBD")));
+
+
+builder.Services.AddScoped<IBaseRepository<UserProfile>, UserProfileRepository>();
+builder.Services.AddScoped<IBaseRepository<Post>, PostRepository>();
+builder.Services.AddScoped<IBaseRepository<PostComment>, PostCommentRepository>();
+
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IPostCommentService, PostCommentService>();
+
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts => {
+    opts.Password.RequiredLength = 5;   // минимальная длина
+    opts.Password.RequireNonAlphanumeric = false;   // требуются ли не алфавитно-цифровые символы
+    opts.Password.RequireLowercase = false; // требуются ли символы в нижнем регистре
+    opts.Password.RequireUppercase = false; // требуются ли символы в верхнем регистре
+    opts.Password.RequireDigit = false; // требуются ли цифры
+}).AddEntityFrameworkStores<UserDbContext>();
 
 
 builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JWTSettings"));
@@ -40,6 +68,8 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true
     };
 });
+
+builder.Services.AddScoped<IAuthorizeService, AuthorizeService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
