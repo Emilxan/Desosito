@@ -1,6 +1,7 @@
 ﻿using Desosito.DAL.Interface;
 using Desosito.DAL.Repositories;
 using Desosito.Domain.Entity;
+using Desosito.Domain.Entity.UserAction;
 using Desosito.Domain.Enum;
 using Desosito.Domain.Responce;
 using Desosito.Domain.ViewModel;
@@ -20,11 +21,13 @@ namespace Desosito.Service.Implementations
     {
         private readonly IBaseRepository<Post> _postRepository;
         private readonly IUserProfileService _userProfileService;
+        private readonly IBaseRepository<LikePost> _likePostRepository;
 
-        public PostService(IBaseRepository<Post> postRepository, IUserProfileService userProfileService)
+        public PostService(IBaseRepository<Post> postRepository, IUserProfileService userProfileService, IBaseRepository<LikePost> likePostRepository)
         {
             _postRepository = postRepository;
             _userProfileService = userProfileService;
+            _likePostRepository = likePostRepository;
         }
 
 
@@ -182,7 +185,7 @@ namespace Desosito.Service.Implementations
                     CreateDateTime = post.CreateDateTime,
                     UserName = post.UserName,
                     RepostScore = post.RepostScore,
-                    LikeScore = post.LikeScore,
+                    LikeScore = LikeScore(id).Result.Data,
                     CommentScore = post.CommentScore,
                     EditDateTime = post.EditDateTime,
                     DeleteDateTime = post.DeleteDateTime,
@@ -239,5 +242,108 @@ namespace Desosito.Service.Implementations
                 };
             }
         }
+
+
+        //User Action
+
+
+        public async Task<IBaseResponse<Post>> ActionLikePost(Guid postId, string userName)
+        {
+            try
+            {
+                var likePostSearch = await _likePostRepository.GetAll().Where(x => x.UserName == userName && x.PostId == postId).FirstOrDefaultAsync();
+
+                if(likePostSearch != null)
+                {
+                    await _likePostRepository.Delete(likePostSearch);
+                }
+                else
+                {
+                    var likePost = new LikePost()
+                    {
+                        UserName = userName,
+                        PostId = postId,
+                        CreateDatetime = DateTime.Now,
+                    };
+                    await _likePostRepository.Create(likePost);
+                }
+
+
+
+                var post = EditLikeScore(postId).Result.Data;
+
+
+                return new BaseResponse<Post>()
+                {
+                    Data = post,
+                    StatusCode = StatusCode.OK
+                };
+            }
+            catch (Exception ex)
+            {;
+                return new BaseResponse<Post>()
+                {
+                    Description = $"[DeleteCar] : {ex.Message}",
+                    StatusCode = StatusCode.InternalServerError
+                };
+            }
+        }
+
+        private async Task<IBaseResponse<Post>> EditLikeScore(Guid postId)
+        {
+            try
+            {
+                var post = await _postRepository.GetAll().FirstOrDefaultAsync(x => x.Id == postId);
+
+                if (post == null)
+                {
+                    return new BaseResponse<Post>()
+                    {
+                        Description = "Car not found",
+                        StatusCode = StatusCode.CarNotFound
+                    };
+                }
+                post.LikeScore = LikeScore(postId).Result.Data;
+                await _postRepository.Update(post);
+
+                return new BaseResponse<Post>()
+                {
+                    Data = post,
+                    StatusCode = StatusCode.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<Post>()
+                {
+                    Description = $"[DeleteCar] : {ex.Message}",
+                    StatusCode = StatusCode.InternalServerError
+                };
+            }
+        }
+
+        private async Task<IBaseResponse<int>> LikeScore(Guid postId)
+        {
+            try
+            {
+                var likeScore = _likePostRepository.GetAll().Where(x => x.Id == postId).ToList();
+
+                return new BaseResponse<int>()
+                {
+                    //Data = likeScore,
+                    StatusCode = StatusCode.OK
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<int>()
+                {
+                    Description = $"[GetCars] : {ex.Message}",
+                    StatusCode = StatusCode.InternalServerError
+                };
+            }
+        }
+
+
     }
 }

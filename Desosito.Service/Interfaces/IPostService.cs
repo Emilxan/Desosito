@@ -26,5 +26,11 @@ namespace Desosito.Service.Interfaces
 
         IBaseResponse<List<Post>> GetLentPost();
 
+
+
+        //User Action
+
+        Task<IBaseResponse<Post>> ActionLikePost(Guid postId, string userName);
+
     }
 }

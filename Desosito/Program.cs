@@ -3,6 +3,7 @@ using Desosito.DAL;
 using Desosito.DAL.Interface;
 using Desosito.DAL.Repositories;
 using Desosito.Domain.Entity;
+using Desosito.Domain.Entity.UserAction;
 using Desosito.Models;
 using Desosito.Service.Implementations;
 using Desosito.Service.Interfaces;
@@ -28,9 +29,15 @@ builder.Services.AddScoped<IBaseRepository<UserProfile>, UserProfileRepository>(
 builder.Services.AddScoped<IBaseRepository<Post>, PostRepository>();
 builder.Services.AddScoped<IBaseRepository<PostComment>, PostCommentRepository>();
 
+//user action
+builder.Services.AddScoped<IBaseRepository<LikePost>, LikePostRepository>();
+
+
+
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IPostCommentService, PostCommentService>();
+builder.Services.AddScoped<IUserActionService, UserActionService>();
 
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts => {

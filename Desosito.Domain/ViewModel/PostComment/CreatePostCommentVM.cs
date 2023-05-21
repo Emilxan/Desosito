@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Desosito.Domain.Entity
+namespace Desosito.Domain.ViewModel
 {
-    public class PostComment
+    public class CreatePostCommentVM
     {
         public Guid Id { get; set; }
         public Guid PostId { get; set; }
@@ -15,7 +15,5 @@ namespace Desosito.Domain.Entity
         public string Body { get; set; }
         public int? LikeScore { get; set; }
         public DateTime CreateDateTime { get; set; }
-        public DateTime? EditDateTime { get; set; }
-        public DateTime? DeleteDateTime { get; set; }
     }
 }

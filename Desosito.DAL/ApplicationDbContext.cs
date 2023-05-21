@@ -1,5 +1,6 @@
 ﻿using Desosito.DAL.Repositories;
 using Desosito.Domain.Entity;
+using Desosito.Domain.Entity.UserAction;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -22,5 +23,10 @@ namespace Desosito.DAL
         public DbSet<UserProfile> UserProfile { get; set; }
         public DbSet<Post> Post { get; set; }
         public DbSet<PostComment> PostComment { get; set; }
+
+        //User Action
+
+        public DbSet<LikePost> LikePost { get; set; }
+        public DbSet<RepostPost> RepostPost { get; set; }
     }
 }
